@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import com.mysql.jdbc.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.DriverManager;
@@ -10,10 +11,11 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.TableModel;
 
 /**
  *
- * @author Sathsarani P.D
+ * @author Sathsarani P.D IT19023038
  */
 public class WorkingDaysManagement extends javax.swing.JFrame {
 
@@ -28,7 +30,7 @@ public class WorkingDaysManagement extends javax.swing.JFrame {
     Connection con;
     PreparedStatement insert;
 
-    
+  
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -69,19 +71,34 @@ public class WorkingDaysManagement extends javax.swing.JFrame {
 
         btn_edit.setBackground(new java.awt.Color(255, 153, 153));
         btn_edit.setText("Edit");
+        btn_edit.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btn_editMouseClicked(evt);
+            }
+        });
 
         btn_delete.setBackground(new java.awt.Color(255, 51, 51));
         btn_delete.setText("Delete");
+        btn_delete.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btn_deleteMouseClicked(evt);
+            }
+        });
 
         jTable1.setBackground(new java.awt.Color(255, 204, 204));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-
+                {"5", "Monday", "06 30"}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "No of Working Days", "Working Days", "Working Time Per DAy"
             }
         ));
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         btn_save.setBackground(new java.awt.Color(153, 255, 102));
@@ -207,6 +224,11 @@ public class WorkingDaysManagement extends javax.swing.JFrame {
 
         btn_cancle.setBackground(new java.awt.Color(153, 153, 153));
         btn_cancle.setText("Cancle");
+        btn_cancle.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btn_cancleMouseClicked(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Tempus Sans ITC", 1, 18)); // NOI18N
         jLabel6.setText("Working Days and Hours");
@@ -271,17 +293,14 @@ public class WorkingDaysManagement extends javax.swing.JFrame {
 
     private void btn_saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_saveActionPerformed
         // TODO add your handling code here:
+        
+        
+        
         Integer myInt1 = (Integer)Spinner_NoOfWorkingDays.getValue();
         String Noworkday = myInt1.toString();
         
         //--WORK DAYS--
         String workdays = "";
-        
-        /*if(jLabel2.isSelected()){
-            String myStr1 = (String)jLabel2.getText();
-            String workday = myStr1.toString();
-            workdays = workdays+","+ workday;
-        }*/
         
         if(jCheckBox_monday.isSelected()){
             String myStr2 = (String)jCheckBox_monday.getText();
@@ -320,39 +339,41 @@ public class WorkingDaysManagement extends javax.swing.JFrame {
             
         }
          if(jCheckBox_sunday.isSelected()){
+           
             String myStr1 = (String)jCheckBox_sunday.getText();
             String jCheckBox_sunday = myStr1.toString();
+  
             workdays = workdays+","+ jCheckBox_sunday;
         }
         
         //--WORK TIME--
         
-        String worktime1;
+        String worktime;
         Integer myInt2 = (Integer)spinner_Hours.getValue();   
         String spinner_Hours = myInt2.toString();
         
         Integer myInt3 = (Integer)spinner_Minutes.getValue();   
-        String worktime2 = myInt3.toString();
+        String spinner_Minutes = myInt3.toString();
         
-        worktime1 = spinner_Hours+","+spinner_Minutes;        
+        worktime = spinner_Hours+","+spinner_Minutes;        
         
         
     
         try {
             
             Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost/timetablemanagementsystem","root","1234");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/AddWorkingDays","root"," ");
             
-            insert = con.prepareStatement("insert into workdaysandhours(Noworkday,workday,worktime) values(?,?,?)");
+            insert = con.prepareStatement("insert into AddworkingDaysAndHours(Noworkday,workday,worktime) values(?,?,?)");
             insert.setString(1, Noworkday);
             insert.setString(2, workdays);
-            insert.setString(3, worktime1);
+            insert.setString(3, worktime);
             
             
             insert.executeUpdate();
             
             JOptionPane.showMessageDialog(this, "Work Days & Hours Added to the System!");
-            
+       
             
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(WorkingDaysManagement.class.getName()).log(Level.SEVERE, null, ex);
@@ -360,7 +381,7 @@ public class WorkingDaysManagement extends javax.swing.JFrame {
             Logger.getLogger(WorkingDaysManagement.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-       // new SystemWorkingDays().setVisible(true);
+        
        dispose();
 
     }//GEN-LAST:event_btn_saveActionPerformed
@@ -377,6 +398,63 @@ public class WorkingDaysManagement extends javax.swing.JFrame {
     private void jCheckBox_wednesdayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox_wednesdayActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jCheckBox_wednesdayActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        // TODO add your handling code here:
+        int i = jTable1.getSelectedRow();
+        TableModel model=jTable1.getModel();
+        String Spinner_NoOfWorkingDays=model.getValueAt(i,1).toString();
+        String jCheckBox_monday=model.getValueAt(i,2).toString();
+        String jCheckBox_tuesday=model.getValueAt(i,2).toString();
+        String jCheckBox_wednesday=model.getValueAt(i,2).toString();
+        String jCheckBox_thursday=model.getValueAt(i,2).toString();
+        String jCheckBox_friday=model.getValueAt(i,2).toString();
+        String jCheckBox_saturday=model.getValueAt(i,2).toString();
+        String jCheckBox_sunday=model.getValueAt(i,2).toString();
+        String spinner_Hours=model.getValueAt(i,3).toString();
+        String spinner_Minutes=model.getValueAt(i,3).toString();
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void btn_deleteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_deleteMouseClicked
+        // TODO add your handling code here:
+        
+        try {  
+        Class.forName("com.mysql.jdbc.Driver");  
+        // establish connection  
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/timetablemanagementsystem","root"," ");  
+        Statement statement = (Statement) con.createStatement();  
+        statement.executeUpdate("DELETE FROM workingdaysaandhours WHERE roll =" + jTable1);  
+        JOptionPane.showMessageDialog(null, "Record deleted...");  
+        statement.close();  
+        con.close();  
+        Referesh(); //Calling Referesh() method  
+    } catch (SQLException | ClassNotFoundException e) {  
+        JOptionPane.showMessageDialog(null, e);  
+    }  
+            
+    }//GEN-LAST:event_btn_deleteMouseClicked
+
+    private void btn_cancleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_cancleMouseClicked
+        // TODO add your handling code here:
+        this.setVisible(false);
+    }//GEN-LAST:event_btn_cancleMouseClicked
+
+    private void btn_editMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_editMouseClicked
+        // TODO add your handling code here:
+        try {  
+        Class.forName("com.mysql.jdbc.Driver");  
+        // establish connection  
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/timetablemanagementsystem","root"," ");  
+        Statement stmt = (Statement) con.createStatement();  
+        stmt.execute("UPDATE workingdaysaandhours SET ='" +jTable1);  
+        JOptionPane.showMessageDialog(null, "Record is updated...");  
+        stmt.close();  
+        con.close();  
+        Referesh(); //Calling Referesh() method  
+    } catch (SQLException | ClassNotFoundException se) {  
+        JOptionPane.showMessageDialog(null, se);  
+    }  
+    }//GEN-LAST:event_btn_editMouseClicked
 
     /**
      * @param args the command line arguments
@@ -411,6 +489,7 @@ public class WorkingDaysManagement extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new WorkingDaysManagement().setVisible(true);
+               
             }
         });
     }
@@ -442,6 +521,12 @@ public class WorkingDaysManagement extends javax.swing.JFrame {
     private javax.swing.JSpinner spinner_Hours;
     private javax.swing.JSpinner spinner_Minutes;
     // End of variables declaration//GEN-END:variables
+
+    private void Referesh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
 
    
 }
